@@ -7,7 +7,7 @@ parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
 # Добавляем в PythonPath
 if parent_dir not in sys.path:
-    sys.path.append(parent_dir)
+	sys.path.append(parent_dir)
 
 # Теперь можно импортировать
 from EasyPygame import *
@@ -34,12 +34,11 @@ class Bird(PhysicsGameObject):
 		self.jumpVelocity = jumpVelocity
 
 	def Update(self):
+
 		if self.EasyGame.MOUSEBUTTONDOWN:
 			self.velocity = Vector2(0,0)
 			self.velocity += self.jumpVelocity
-		elif self.EasyGame.GetKeyState(pygame.K_SPACE): 
-			self.velocity = Vector2(0,0)
-			self.velocity += self.jumpVelocity
+			self.EasyGame.PlaySound('examples/data/sfx/jump.wav')
 
 
 class Tubes():

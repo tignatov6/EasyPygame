@@ -168,6 +168,34 @@ class EasyGame():
 			if e.type == pygame.MOUSEBUTTONDOWN:
 				self.MOUSEBUTTONDOWN = True
 		return quit
+
+	def CheckEvent(self,pygameEvent):
+		for e in self.events:
+			if e.type == pygameEvent:
+				return True
+		return False
+	
+	def CheckEvents(self,pygameEvents,ReturnOneBool = True):
+		"""
+		Might be broken if ReturnOneBool = False
+		"""
+	
+
+		if not ReturnOneBool:
+			foundEvents = []
+		for e in self.events:
+			for pygameEvent in pygameEvents:
+				if e.type == pygameEvent:
+					if ReturnOneBool:
+						return True
+					else:
+						foundEvents.append[True]
+			if not ReturnOneBool:
+				foundEvents.append[False]
+		if ReturnOneBool:
+			return False
+		else:
+			return foundEvents
 		
 				
 	def GetKeyState(self,key):
@@ -209,7 +237,7 @@ class EasyGame():
 		mixer.music.load(music_path)
 		mixer.music.play(count)
 
-	def PlaySound(self,sound_path,count=1):
+	def PlaySound(self,sound_path,count=0):
 		"""
 		Don`t write count for play once
 		"""

@@ -1,7 +1,7 @@
 import sys
 import os
 
-#Эта структура не нужна, если EasyPygame.py находится в той же папке что и этот файл
+# Эта структура не нужна, если EasyPygame.py находится в той же папке что и этот файл
 # Получаем абсолютный путь к родительской директории
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 

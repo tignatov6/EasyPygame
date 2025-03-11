@@ -1,7 +1,7 @@
 import sys
 import os
 
-#Эта структура не нужна, если EasyPygame.py находится в той же папке что и этот файл
+# Эта структура не нужна, если EasyPygame.py находится в той же папке что и этот файл
 # Получаем абсолютный путь к родительской директории
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
@@ -88,7 +88,7 @@ previousField = [0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5]
 XorO = 1 # 1 = X 0 = O
 
 buttons = []
-buttonsScale = 640/3
+buttonsScale = ((size[0] + size[1]) /2 )/3
 offset = buttonsScale/2
 
 game = EasyGame(size,(255,255,255))
@@ -116,7 +116,7 @@ while running:
 				XorO = 1 - XorO  # Переключение между 1 и 0
 				changes = get_changes(field, previousField)  # Получаем массив изменений
 				previousField = field.copy()
-				print("Изменения:", changes)  # Выводим массив изменений
+				#print("Изменения:", changes)  # Выводим массив изменений
 
 				#save_game_state(field,XorO,changes)
 

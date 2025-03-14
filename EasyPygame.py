@@ -6,19 +6,28 @@ import sys
 
 
 pygame.init()
-mixer.init()
+try:
+	mixer.init()
+except:
+	pass
 pi = 3.1415926535
 
 # После импортов
-if not pygame.get_init():
-	raise RuntimeError("Pygame не инициализирован!")
+try:
+	if not pygame.get_init():
+		raise RuntimeError("Pygame не инициализирован!")
+except:
+	pass
 
 # Проверка инициализации дисплея
 if not pygame.display.get_init():
 	pygame.display.init()
 
 def get_font(size): # Returns Press-Start-2P in the desired size
-	return font.Font("data/fonts/font.ttf", size)
+	try:
+		return pygame.font.Font("data/fonts/font.ttf", size)
+	except:
+		return pygame.font.Font("font.png", size)
 
 def calculate_v1(u1: Vector2, u2: Vector2, m1: float, m2: float, 
 				e1: float, e2: float, normal: Vector2) -> Vector2:
@@ -124,7 +133,10 @@ class EasyGame():
 		self.gameObjects = []
 		self.events = None
 		self.keysPressed = None
-		self.prev_time = time.perf_counter()
+		try:
+			self.prev_time = time.perf_counter()
+		except:
+			self.prev_time = time.time()
 		self.current_time = 0
 		self.delta_time = 0
 		self.prev_time = 0
@@ -153,11 +165,17 @@ class EasyGame():
 	def processEvents(self):
 		self.MOUSE_POS = pygame.mouse.get_pos()
 		if self.started == False:
-			self.prev_time = time.perf_counter()
+			try:
+				self.prev_time = time.perf_counter()
+			except:
+				self.prev_time = time.time()
 			self.started = True
 		self.events = event.get()
 		self.keysPressed = key.get_pressed()
-		self.current_time = time.perf_counter()
+		try:
+			self.current_time = time.perf_counter()
+		except:
+			self.current_time = time.time()
 		self.delta_time = self.current_time - self.prev_time
 		self.prev_time = self.current_time
 		quit = True
@@ -253,7 +271,7 @@ class Button():
 	def __init__(self,EasyGame, image, pos, text_input, font, base_color, hovering_color,imageScale = Vector2()):
 		try:
 			if imageScale.x > 0 and imageScale.y > 0:
-				self.image = transform.scale(pygame.image.load(image), (int(imageScale.x),int(imageScale.y)))
+				self.image = pygame.transform.scale(pygame.image.load(image), (int(imageScale.x),int(imageScale.y)))
 			else:
 				self.image = pygame.image.load(image)
 		except:
@@ -272,8 +290,10 @@ class Button():
 		self.text_input = text_input
 		self.text = self.font.render(self.text_input, True, self.base_color)
 		if self.image is None:
-			self.image = self.text
-		self.rect = self.image.get_rect(center=(self.x_pos, self.y_pos))
+			#self.image = self.text
+			self.image = pygame.Surface((0, 0))  # Заглушка
+			#self.image.fill((255, 0, 0))  # Красный цвет для отладки
+		self.rect = self.image.get_rect(center=(int(self.x_pos), int(self.y_pos)))
 		self.text_rect = self.text.get_rect(center=(self.x_pos, self.y_pos))
 
 	def blit(self):
@@ -344,7 +364,7 @@ class GameObject():
 		self.scale = scale
 		self.sprite = str(sprite)
 		self.offset = offset
-		self.pygameObject = transform.scale(image.load(self.sprite), (int(self.scale.x * self.EasyGame.cameraScale.x),int(self.scale.y * self.EasyGame.cameraScale.y)))
+		self.pygameObject = pygame.transform.scale(pygame.image.load(self.sprite), (int(self.scale.x * self.EasyGame.cameraScale.x),int(self.scale.y * self.EasyGame.cameraScale.y)))
 		self.active = True
 		self.EasyGame.gameObjects.append(self)
 		self.collisionMode = collisionMode
@@ -369,7 +389,7 @@ class GameObject():
 		
 	def ChangeScale(self, newscale):
 			self.scale = newscale
-			self.pygameObject = transform.scale(image.load(self.sprite), (int(self.scale.x * self.EasyGame.cameraScale.x),int(self.scale.y * self.EasyGame.cameraScale.y)))
+			self.pygameObject = pygame.transform.scale(pygame.image.load(self.sprite), (int(self.scale.x * self.EasyGame.cameraScale.x),int(self.scale.y * self.EasyGame.cameraScale.y)))
 
 	def OnCollisionEnter(self,tag = 'None',collisionsThreshold = 1):
 		collisions = self.CheckCollisions(tag=tag,returnOnlyCollisionsCount=True)
@@ -417,14 +437,14 @@ class GameObject():
 							if Vector2(self.position.x+(self.scale.x/2),self.position.y+(self.scale.y/2)).distance((gameObject.position + Vector2(gameObject.scale.x/2,gameObject.scale.y/2))) <= self.radius + gameObject.radius:
 								collisions += 1
 								if returnOnlyCollidedGameObjects:
-									collided.append[gameObject]
+									collided.append(gameObject)
 								if not returnOnlyCollisionsCount:
 									break 
 						if gameObject.collisionMode == 'box':
 							if self.position.x+(self.scale.x) >= gameObject.position.x  and self.position.x  <= gameObject.position.x  + (gameObject.scale.x) and self.position.y  <= gameObject.position.y+(gameObject.scale.y ) and self.position.y  + (self.scale.y) >= gameObject.position.y :
 								collisions += 1
 								if returnOnlyCollidedGameObjects:
-									collided.append[gameObject]
+									collided.append(gameObject)
 								if not returnOnlyCollisionsCount:
 									break 
 
@@ -529,11 +549,18 @@ if __name__ == "__main__":
 
 	game = EasyGame(size,cameraPosition=Vector2(-0,-0),cameraScale=Vector2(0.5,0.5))
 
-	ball = GameObject(game,Vector2(0,10),Vector2(50,50),'data/textures/ball.png',collisionMode='circle',tag='ball',)
-	ball1 = GameObject(game,Vector2(size[0]/2+200,size[1]/2),scale=Vector2(100,10),collisionMode='circle',tag='ball',sprite='data/textures/ball.png')
-	ball2 = PhysicsGameObject(game,position=Vector2(0,10),collisionMode='circle',tag='ball',sprite='data/textures/ball.png',scale=Vector2(50,50))
-	block = GameObject(game,position=Vector2(0,100),collisionMode='box',tag='box',sprite='data/textures/Block.png',scale=Vector2(700,100))
-	button = Button(game,'data/textures/platform.png',Vector2(size[0]/2,size[1]/2),'Example Exit Button',get_font(25),"#d7fcd4","White",Vector2(600,150))
+	try:
+		ball = GameObject(game,Vector2(0,10),Vector2(50,50),'data/textures/ball.png',collisionMode='circle',tag='ball',)
+		ball1 = GameObject(game,Vector2(size[0]/2+200,size[1]/2),scale=Vector2(100,10),collisionMode='circle',tag='ball',sprite='data/textures/ball.png')
+		ball2 = PhysicsGameObject(game,position=Vector2(0,10),collisionMode='circle',tag='ball',sprite='data/textures/ball.png',scale=Vector2(50,50))
+		block = GameObject(game,position=Vector2(0,100),collisionMode='box',tag='box',sprite='data/textures/Block.png',scale=Vector2(700,100))
+		button = Button(game,'data/textures/platform.png',Vector2(size[0]/2,size[1]/2),'Example Exit Button',get_font(25),"#d7fcd4","White",Vector2(600,150))
+	except:
+		ball = GameObject(game,Vector2(0,10),Vector2(50,50),'ball.png',collisionMode='circle',tag='ball',)
+		ball1 = GameObject(game,Vector2(size[0]/2+200,size[1]/2),scale=Vector2(100,10),collisionMode='circle',tag='ball',sprite='ball.png')
+		ball2 = PhysicsGameObject(game,position=Vector2(0,10),collisionMode='circle',tag='ball',sprite='ball.png',scale=Vector2(50,50))
+		block = GameObject(game,position=Vector2(0,100),collisionMode='box',tag='box',sprite='Block.png',scale=Vector2(700,100))
+		button = Button(game,'platform.png',Vector2(size[0]/2,size[1]/2),'Example Exit Button',get_font(25),"#d7fcd4","White",Vector2(600,150))
 	lable = Lable(game,Vector2(200,100),'Example Lable',get_font(25),"#d7fcd4","White")
 	running = True
 	speed = 1000

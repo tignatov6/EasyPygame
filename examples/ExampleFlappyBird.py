@@ -100,6 +100,7 @@ def main_game():
 	button = Button(game,'examples/data/textures/Block.png',Vector2(50,50),'Exit',get_font(25),"#d7fcd4","White",Vector2(100,100))
 	# Текст для вывода счёта
 	lable = Lable(game,Vector2(size[0]/2,100),'',get_font(25),"#d7fcd4","White")
+	fps_lable = Lable(game,Vector2(size[0]-100,15),'',get_font(25),"#d7fcd4","White")
 
 	# Часы для ограничения фпс (не обязательно, но ОЧЕНЬ ЖЕЛАТЕЛЬНО при использовании PhysicsGameObject и наследуемых от него классов)
 	clock = Clock()
@@ -126,6 +127,7 @@ def main_game():
 			return False
 		# Задаём текст для вывода счёта на экран
 		lable.setText(f'{game.score}')
+		fps_lable.setText(f'FPS: {1/game.delta_time:.0f}')
 		# Рисуем сцену
 		game.Render()
 		# обновляем изображение на экране

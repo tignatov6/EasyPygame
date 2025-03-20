@@ -103,7 +103,8 @@ def main_game():
 	fps_lable = Lable(game,Vector2(size[0]-100,15),'',get_font(25),"#d7fcd4","White")
 
 	# Часы для ограничения фпс (не обязательно, но ОЧЕНЬ ЖЕЛАТЕЛЬНО при использовании PhysicsGameObject и наследуемых от него классов)
-	clock = Clock()
+	clock = pygame.time.Clock()
+	#clock = Clock()
 	running = True
 	# Главеный цикл игры
 	while running:

@@ -126,10 +126,13 @@ class Vector2():
 		return self.x * other.x + self.y * other.y
 	
 class EasyGame():
-	def __init__(self, size=(256,256),color=(0,0,0),cameraPosition=Vector2(0,0), cameraScale = Vector2(1,1)):
+	def __init__(self, size=(256,256),color=(0,0,0),cameraPosition=Vector2(0,0), cameraScale = Vector2(1,1),fullscreen=False):
 		self.size = size
 		self.color = color
-		self.window = pygame.display.set_mode(size)
+		if fullscreen:
+			self.window = pygame.display.set_mode(size,pygame.FULLSCREEN)
+		else:
+			self.window = pygame.display.set_mode(size)
 		self.gameObjects = []
 		self.events = None
 		self.keysPressed = None
@@ -545,8 +548,8 @@ class PhysicsGameObject(GameObject):
 			# self.OnCollisionStay()
 			# if self.collided:
 			# 	self.velocity = Vector2(0,0)
-			self.position = self.position + self.velocity * self.EasyGame.delta_time
 			a = self.PhysicsCollisions()
+			self.position = self.position + self.velocity * self.EasyGame.delta_time
 
 	def PhysicsCollisions(self,tag = 'None'):
 		"""
@@ -580,31 +583,26 @@ class PhysicsGameObject(GameObject):
 
 						if gameObject.collisionMode == 'box':
 							if self.position.x+(self.scale.x) >= gameObject.position.x  and self.position.x  <= gameObject.position.x  + (gameObject.scale.x) and self.position.y  <= gameObject.position.y+(gameObject.scale.y ) and self.position.y  + (self.scale.y) >= gameObject.position.y :
-								# Расчет пересечения
-								overlap_x = (self.scale.x/2 + gameObject.scale.x/2) - abs(self.position.x - gameObject.position.x)
-								overlap_y = (self.scale.y/2 + gameObject.scale.y/2) - abs(self.position.y - gameObject.position.y)
-
-								# Определение стороны столкновения
-								if overlap_x < overlap_y:
-									if self.position.x < gameObject.position.x:
-										# Столкновение слева
-										self.position.x -= overlap_x
-										self.velocity.x *= -0.1
-									else:
-										# Столкновение справа
-										self.position.x += overlap_x
-										self.velocity.x *= -0.1
-								else:
-									if self.position.y < gameObject.position.y:
-										# Столкновение сверху
-										self.position.y -= overlap_y
-										self.velocity.y *= -0.1
-									else:
-										# Столкновение снизу
-										self.position.y += overlap_y
-										self.velocity.y *= -0.1
-
-
+								try:
+									LenVel = float(self.velocity.len() + gameObject.velocity.len())
+								except:
+									LenVel = float(self.velocity.len())
+								# Up
+								if self.position.y + self.scale.y <= gameObject.position.y or self.position.y + self.scale.y <= gameObject.position.y + gameObject.scale.y*0.01*LenVel:
+									if self.velocity.y > 0:
+										self.velocity.y *= -self.bouncy
+								# Down
+								if self.position.y >= gameObject.position.y + gameObject.scale.y or self.position.y + self.scale.y *0.01*LenVel >= gameObject.position.y + gameObject.scale.y:
+									if self.velocity.y < 0:
+										self.velocity.y *= -self.bouncy
+								# Right
+								if self.position.x + self.scale.x <= gameObject.position.x or self.position.x + self.scale.x <= gameObject.position.x + gameObject.scale.x*0.01*LenVel:
+									if self.velocity.x > 0:
+										self.velocity.x *= -self.bouncy
+								# Left
+								if self.position.x >= gameObject.position.x + gameObject.scale.x or self.position.x + self.scale.x *0.01*LenVel >= gameObject.position.x + gameObject.scale.x:
+									if self.velocity.x < 0:
+										self.velocity.x *= -self.bouncy
 
 
 
@@ -617,9 +615,9 @@ if __name__ == "__main__":
 
 	game = EasyGame(size,cameraPosition=Vector2(-0,-0),cameraScale=Vector2(0.5,0.5))
 
-	ball = GameObject(game,Vector2(0,10),Vector2(50,50),'data/textures/ball.png',collisionMode='circle',tag='ball',)
-	ball1 = GameObject(game,Vector2(size[0]/2+200,size[1]/2),scale=Vector2(100,10),collisionMode='circle',tag='ball',sprite='data/textures/ball.png')
-	ball2 = PhysicsGameObject(game,position=Vector2(0,10),collisionMode='circle',tag='ball',sprite='data/textures/ball.png',scale=Vector2(50,50))
+	ball = GameObject(game,Vector2(0,10),Vector2(50,50),'data/textures/ball.png',collisionMode='box',tag='ball',)
+	ball1 = GameObject(game,Vector2(size[0]/2+200,size[1]/2),scale=Vector2(100,10),collisionMode='box',tag='ball',sprite='data/textures/ball.png')
+	ball2 = PhysicsGameObject(game,position=Vector2(50,-100),collisionMode='box',tag='ball',sprite='data/textures/ball.png',scale=Vector2(50,50))
 	block = GameObject(game,position=Vector2(0,100),collisionMode='box',tag='box',sprite='data/textures/Block.png',scale=Vector2(700,100))
 	button = Button(game,'data/textures/platform.png',Vector2(size[0]/2,size[1]/2),'Example Exit Button',get_font(25),"#d7fcd4","White",Vector2(600,150))
 	img = Image(game,Vector2(500,500),'data/textures/Block.png')
